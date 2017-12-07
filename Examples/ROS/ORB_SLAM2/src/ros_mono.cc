@@ -61,15 +61,40 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nodeHandler;
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
-
+//    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ros::Subscriber sub = nodeHandler.subscribe("/camera/rgb/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    
     ros::spin();
 
     // Stop all threads
     SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    //SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+
+    // Save camera trajectory
+    std::string Filename = "";
+    if (argc == 4){
+
+    Filename = std::string(argv[3]);
+    std::string last = Filename.substr(Filename.length()-1);
+    std::string slash = "/";
+    if (last.compare(slash)!=0) {
+        Filename.push_back('/');
+    }
+    }
+
+    std::string TrajectoryFilename = Filename + "KeyFrameTrajectory.txt";
+    SLAM.SaveKeyFrameTrajectoryTUM(TrajectoryFilename);
+
+    // Save pointcloud
+    std::string PCDFilename = Filename + "pointcloud.pcd";
+    SLAM.CreatePCD(PCDFilename);
+
+
+
+    // Save the created pointcloud
+    //SLAM.CreatePCD("pointcloud.pcd");
 
     ros::shutdown();
 

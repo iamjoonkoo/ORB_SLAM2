@@ -77,7 +77,26 @@ int main(int argc, char **argv)
     SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    //SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+
+    // Save camera trajectory
+    std::string Filename = "";
+    if (argc == 4){
+
+    Filename = std::string(argv[3]);
+    std::string last = Filename.substr(Filename.length()-1);
+    std::string slash = "/";
+    if (last.compare(slash)!=0) {
+        Filename.push_back('/');
+    }
+    }
+
+    std::string TrajectoryFilename = Filename + "KeyFrameTrajectory.txt";
+    SLAM.SaveKeyFrameTrajectoryTUM(TrajectoryFilename);
+
+    // Save pointcloud
+    std::string PCDFilename = Filename + "pointcloud.pcd";
+    SLAM.CreatePCD(PCDFilename);
 
     ros::shutdown();
 
@@ -111,5 +130,3 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const senso
 
     mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec());
 }
-
-
